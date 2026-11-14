@@ -11,9 +11,10 @@
     "generate:check": "python3 scripts/generate.py --check",
     "validate": "npm run generate:check && likec4 validate src --max-warnings 0",
     "dev": "npm run generate && likec4 serve src --port 3000",
-    "build": "npm run generate && likec4 build src -o dist --use-hash-history --title 'Integration Atlas — LikeC4 demo'",
+    "prebuild": "node -e \"require('node:fs').rmSync('dist', {recursive: true, force: true})\"",
+    "build": "npm run generate && likec4 build src -o dist --output-single-file --base ./ --use-hash-history --title 'Integration Atlas — LikeC4 demo' && python3 scripts/render_readme.py",
     "preview": "likec4 preview src -o dist",
-    "test": "likec4 export json src --pretty --skip-layout -o .likec4/model.json && python3 scripts/verify_model.py .likec4/model.json"
+    "test": "likec4 export json src --pretty --skip-layout -o .likec4/model.json && python3 scripts/verify_model.py .likec4/model.json && python3 -m unittest discover -s tests -v"
   },
   "devDependencies": {
     "likec4": "1.60.0"

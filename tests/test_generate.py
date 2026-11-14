@@ -174,7 +174,7 @@ class ViewTests(unittest.TestCase):
             root = Path(directory)
             (root / 'README.md').write_text('[Guide](guide.md)')
             (root / 'guide.md').write_text('# Guide')
-            for folder in ('likec4-poc/node_modules/library', 'likec4-poc/dist'):
+            for folder in ('likec4-poc/node_modules/library', 'likec4-poc/dist', 'likec4-poc/.likec4'):
                 target = root / folder
                 target.mkdir(parents=True)
                 (target / 'README.md').write_text('[Broken third-party link](absent.md)')

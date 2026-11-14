@@ -359,7 +359,14 @@ All systems, owners, contracts, and versions are fictional examples.
 Click a blue or gray system node to see every incoming and outgoing interface.
 The link table below provides the same navigation in any Markdown viewer.
 
-{views}## Integration landscape
+{views}## LikeC4 demonstration
+
+[Open the rendered LikeC4 build]({catalog['repository_url']}/tree/likec4-rendered) ·
+[Source and running instructions](likec4-poc/README.md)
+
+The rendered branch updates automatically after a successful LikeC4 build on `main`.
+
+## Integration landscape
 
 ```mermaid
 {mermaid}```
@@ -473,7 +480,7 @@ Directions follow the primary request or data flow. HTTP responses use the same 
 
 def check_links():
     count = 0
-    ignored = {'.git', '.venv', '__pycache__', 'node_modules', 'dist'}
+    ignored = {'.git', '.venv', '__pycache__', 'node_modules', 'dist', '.likec4'}
     for directory, children, files in os.walk(ROOT):
         children[:] = [name for name in children if name not in ignored]
         for name in files:

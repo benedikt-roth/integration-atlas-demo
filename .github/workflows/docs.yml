@@ -1,6 +1,8 @@
 name: Check integration documentation
 on:
   push:
+    branches-ignore:
+      - likec4-rendered
   pull_request:
 permissions:
   contents: read

@@ -16,6 +16,13 @@ The link table below provides the same navigation in any Markdown viewer.
 | [Invoice creation](docs/views/invoice-creation.md) | scenario | From an accepted order to a confirmed ERP invoice, with linked mapping rules and an explicit response. |
 | [Invoicing subdomain](docs/views/invoicing-overview.md) | overview | Order events, invoice creation, and payment updates, without implying an execution sequence. |
 
+## LikeC4 demonstration
+
+[Open the rendered LikeC4 build](https://github.com/benedikt-roth/integration-atlas-demo/tree/likec4-rendered) ·
+[Source and running instructions](likec4-poc/README.md)
+
+The rendered branch updates automatically after a successful LikeC4 build on `main`.
+
 ## Integration landscape
 
 ```mermaid

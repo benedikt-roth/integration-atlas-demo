@@ -1,5 +1,8 @@
 # LikeC4 proof of concept
 
+**[Open the rendered build in this repository](https://github.com/benedikt-roth/integration-atlas-demo/tree/likec4-rendered)** ·
+**[Download the interactive HTML](https://github.com/benedikt-roth/integration-atlas-demo/blob/likec4-rendered/index.html?raw=true)**
+
 A runnable [LikeC4](https://likec4.dev/) demonstration alongside the existing
 Mermaid implementation. It uses the **same catalog, interfaces, scenarios, and
 documentation artifacts**. LikeC4 is pinned to **1.60.0**, released under the
@@ -19,8 +22,9 @@ npm run build
 npm run preview
 ```
 
-Open the **local URL printed by the preview command**. The viewer runs locally;
-GitHub renders this README and the screenshots, not the interactive `.c4` viewer.
+Open the **local URL printed by the preview command**. GitHub renders the
+build-generated page and its diagrams directly. The full interactive LikeC4
+viewer is available in the built HTML and through the local preview command.
 For editing with live diagram reload, use `npm run dev` and open the printed URL
 (port 3000). After editing the catalog, rerun `npm run generate` to refresh the
 LikeC4 source watched by the viewer.
@@ -132,7 +136,24 @@ hide this issue.
 
 The **Check LikeC4 demonstration** GitHub Actions workflow validates and builds
 the demo, then attaches a downloadable **likec4-demo-site** artifact to the run.
-It does not publish a website. To serve an extracted artifact, run
+After a successful build on `main`, it also publishes the build to the
+**`likec4-rendered` branch**. Open that branch in GitHub to read its rendered
+README, which contains native LikeC4 diagram exports, a numbered sequence, and
+clickable annotation, interface, and contract references. The page records the
+source commit used by its build.
+
+The same branch contains **`index.html`**, with the interactive viewer's scripts
+and styles embedded. Download it using the link above, or clone the output
+branch and serve its directory locally. Pull-request builds attach artifacts
+without changing the published branch.
+
+`npm run build` produces both the interactive HTML and `dist/README.md`; the
+Markdown page is generated from LikeC4's own export plus the shared catalog's
+numbered flow and canonical reference tables. `npm test` checks that published
+references point to the source branch, including the IF-003 response and mapping
+rules, and that native diagrams survive report generation.
+
+To serve an extracted artifact, run
 `python3 -m http.server 3000` inside its extracted directory and open
 `http://localhost:3000/`; hash-based navigation works with a plain static server.
 
