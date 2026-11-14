@@ -4,6 +4,7 @@
 import argparse
 import html
 import json
+import os
 import posixpath
 import re
 import sys
@@ -472,17 +473,21 @@ Directions follow the primary request or data flow. HTTP responses use the same 
 
 def check_links():
     count = 0
-    for file in ROOT.rglob('*.md'):
-        if '.git' in file.relative_to(ROOT).parts:
-            continue
-        text = re.sub(r'```.*?```', '', file.read_text(), flags=re.S)
-        for destination in re.findall(r'\[[^\]]*\]\(([^\s)]+)\)', text):
-            url = urlsplit(destination)
-            if url.scheme or url.netloc or not url.path:
+    ignored = {'.git', '.venv', '__pycache__', 'node_modules', 'dist'}
+    for directory, children, files in os.walk(ROOT):
+        children[:] = [name for name in children if name not in ignored]
+        for name in files:
+            if not name.endswith('.md'):
                 continue
-            path = (file.parent / unquote(url.path)).resolve()
-            require(path.is_relative_to(ROOT) and path.exists(), f'{file.relative_to(ROOT)}: broken link {destination}')
-            count += 1
+            file = Path(directory) / name
+            text = re.sub(r'```.*?```', '', file.read_text(), flags=re.S)
+            for destination in re.findall(r'\[[^\]]*\]\(([^\s)]+)\)', text):
+                url = urlsplit(destination)
+                if url.scheme or url.netloc or not url.path:
+                    continue
+                path = (file.parent / unquote(url.path)).resolve()
+                require(path.is_relative_to(ROOT) and path.exists(), f'{file.relative_to(ROOT)}: broken link {destination}')
+                count += 1
     return count
 
 

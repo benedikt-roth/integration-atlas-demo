@@ -169,6 +169,18 @@ class ViewTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'broken link'):
             g.check_links()
 
+    def test_link_check_ignores_dependency_and_build_documents(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'README.md').write_text('[Guide](guide.md)')
+            (root / 'guide.md').write_text('# Guide')
+            for folder in ('likec4-poc/node_modules/library', 'likec4-poc/dist'):
+                target = root / folder
+                target.mkdir(parents=True)
+                (target / 'README.md').write_text('[Broken third-party link](absent.md)')
+            with patch.object(g, 'ROOT', root):
+                self.assertEqual(g.check_links(), 1)
+
 
 if __name__ == '__main__':
     unittest.main()
