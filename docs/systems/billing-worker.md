@@ -17,3 +17,8 @@ Boundary: **internal**. Owner: **Finance Engineering**.
 | Incoming | [IF-004 — Payment status webhook](../interfaces/IF-004.md) | [External ERP](erp.md) | 1.2.0 |
 
 Directions follow the primary request or data flow. HTTP responses use the same interface.
+
+## Used in views
+
+- [Invoice creation](../views/invoice-creation.md)
+- [Invoicing subdomain](../views/invoicing-overview.md)

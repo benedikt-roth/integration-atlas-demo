@@ -1,6 +1,43 @@
 {
   "repository_url": "https://github.com/benedikt-roth/integration-atlas-demo",
   "branch": "main",
+  "views": [
+    {
+      "id": "invoice-creation",
+      "kind": "scenario",
+      "title": "Invoice creation",
+      "summary": "From an accepted order to a confirmed ERP invoice, with linked mapping rules and an explicit response.",
+      "steps": [
+        {
+          "interface_id": "IF-001",
+          "annotation": {
+            "text": "Order accepted"
+          }
+        },
+        {
+          "interface_id": "IF-003",
+          "annotation": {
+            "text": "Create invoice using the mapping rules",
+            "target": "docs/notes/invoice-mapping.md"
+          }
+        },
+        {
+          "interface_id": "IF-003",
+          "direction": "reverse",
+          "annotation": {
+            "text": "Return invoice ID"
+          }
+        }
+      ]
+    },
+    {
+      "id": "invoicing-overview",
+      "kind": "overview",
+      "title": "Invoicing subdomain",
+      "summary": "Order events, invoice creation, and payment updates, without implying an execution sequence.",
+      "interface_ids": ["IF-001", "IF-003", "IF-004"]
+    }
+  ],
   "systems": [
     {
       "id": "order-service",
