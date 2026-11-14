@@ -1,0 +1,136 @@
+{
+  "repository_url": "https://github.com/benedikt-roth/integration-atlas-demo",
+  "branch": "main",
+  "systems": [
+    {
+      "id": "order-service",
+      "name": "Order Service",
+      "boundary": "internal",
+      "owner": "Commerce Team",
+      "description": "Accepts orders and looks up customer records in CRM."
+    },
+    {
+      "id": "billing-worker",
+      "name": "Billing Worker",
+      "boundary": "internal",
+      "owner": "Finance Engineering",
+      "description": "Consumes order events, creates ERP invoices, and receives payment status updates."
+    },
+    {
+      "id": "crm",
+      "name": "External CRM",
+      "boundary": "external",
+      "owner": "CRM Vendor / Customer Operations",
+      "description": "Fictional external customer system; also exports customers directly to ERP."
+    },
+    {
+      "id": "erp",
+      "name": "External ERP",
+      "boundary": "external",
+      "owner": "ERP Vendor / Finance Operations",
+      "description": "Fictional external finance system for invoices, payments, and customer master data."
+    }
+  ],
+  "interfaces": [
+    {
+      "id": "IF-001",
+      "name": "Order placed event",
+      "source": "order-service",
+      "target": "billing-worker",
+      "deployed_version": "1.0.0",
+      "protocol": "AMQP / JSON",
+      "interaction": "Publish order.placed to the billing queue",
+      "owner": "Commerce Team",
+      "status": "active",
+      "artifact": "contracts/orders/order-placed-1.0.0.schema.json",
+      "artifact_type": "JSON Schema",
+      "summary": "Triggers invoice creation after an order is accepted.",
+      "authentication": "Broker service identity with publish/consume permissions.",
+      "reliability": "At-least-once delivery; deduplicate by eventId. Retry transient failures, then route to a dead-letter queue.",
+      "notes": [
+        "The arrow follows event flow from publisher to subscriber.",
+        "This is an internal-to-internal connection."
+      ]
+    },
+    {
+      "id": "IF-002",
+      "name": "Customer lookup",
+      "source": "order-service",
+      "target": "crm",
+      "deployed_version": "1.4.0",
+      "protocol": "HTTPS / REST / JSON",
+      "interaction": "GET /v1/customers/{customerId}",
+      "owner": "Commerce Team",
+      "status": "active",
+      "artifact": "contracts/crm/customer-api-1.4.0.openapi.json",
+      "artifact_type": "OpenAPI 3.1",
+      "summary": "Resolves a customer record while accepting an order.",
+      "authentication": "OAuth 2.0 client credentials; scope customers:read.",
+      "reliability": "3-second timeout; retry 429 and transient 5xx with bounded backoff. Do not retry 404.",
+      "notes": [
+        "The arrow follows the HTTP request; the response travels back on the same connection.",
+        "The deployed contract version is 1.4.0; /v1 is only the API major-version route."
+      ]
+    },
+    {
+      "id": "IF-003",
+      "name": "Create invoice",
+      "source": "billing-worker",
+      "target": "erp",
+      "deployed_version": "2.1.0",
+      "protocol": "HTTPS / REST / JSON",
+      "interaction": "POST /v2/invoices",
+      "owner": "Finance Engineering",
+      "status": "active",
+      "artifact": "contracts/erp/invoices-2.1.0.openapi.json",
+      "artifact_type": "OpenAPI 3.1",
+      "summary": "Creates one invoice for an accepted order.",
+      "authentication": "OAuth 2.0 client credentials; scope invoices:write.",
+      "reliability": "Send Idempotency-Key equal to orderId; retry transient errors using the same key.",
+      "notes": [
+        "Payment updates arrive separately via IF-004.",
+        "This is an internal-to-external connection."
+      ]
+    },
+    {
+      "id": "IF-004",
+      "name": "Payment status webhook",
+      "source": "erp",
+      "target": "billing-worker",
+      "deployed_version": "1.2.0",
+      "protocol": "HTTPS / webhook / JSON",
+      "interaction": "POST /webhooks/erp/payment-status",
+      "owner": "Finance Engineering",
+      "status": "active",
+      "artifact": "contracts/erp/payment-status-1.2.0.schema.json",
+      "artifact_type": "JSON Schema",
+      "summary": "Notifies the Billing Worker when an invoice payment status changes.",
+      "authentication": "Verify the vendor HMAC signature and reject timestamps outside the replay window.",
+      "reliability": "Return 2xx after durable enqueue; deduplicate by eventId. Vendor retries non-2xx responses.",
+      "notes": [
+        "The arrow follows the inbound webhook request from external ERP.",
+        "A JSON Schema defines the payload; this page documents transport and operational behavior."
+      ]
+    },
+    {
+      "id": "IF-005",
+      "name": "Nightly customer export",
+      "source": "crm",
+      "target": "erp",
+      "deployed_version": "3.0.0",
+      "protocol": "SFTP / UTF-8 CSV",
+      "interaction": "Nightly /inbound/customers/customers-YYYYMMDD.csv",
+      "owner": "Customer Operations",
+      "status": "active",
+      "artifact": "contracts/customer-export/customer-export-3.0.0.md",
+      "artifact_type": "CSV data dictionary",
+      "summary": "Transfers customer master data directly between the two external systems.",
+      "authentication": "Vendor-managed SFTP key; the internal platform does not hold credentials.",
+      "reliability": "Upload to a temporary name, then rename atomically; ERP acknowledges with a .done file. Alert on a missing daily delivery.",
+      "notes": [
+        "This connection bypasses internal components but remains part of the integration landscape.",
+        "Customer Operations owns coordination between the two vendors."
+      ]
+    }
+  ]
+}
