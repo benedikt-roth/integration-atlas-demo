@@ -9,6 +9,13 @@ All systems, owners, contracts, and versions are fictional examples.
 Click a blue or gray system node to see every incoming and outgoing interface.
 The link table below provides the same navigation in any Markdown viewer.
 
+## Focused views
+
+| View | Kind | Purpose |
+| --- | --- | --- |
+| [Invoice creation](docs/views/invoice-creation.md) | scenario | From an accepted order to a confirmed ERP invoice, with linked mapping rules and an explicit response. |
+| [Invoicing subdomain](docs/views/invoicing-overview.md) | overview | Order events, invoice creation, and payment updates, without implying an execution sequence. |
+
 ## Integration landscape
 
 ```mermaid
@@ -75,13 +82,16 @@ The interface node makes every connection individually addressable.
 The [catalog](catalog/catalog.json) is the source for IDs, endpoints, deployed versions, owners, and operational notes.
 The [versioned contracts](contracts/) contain the actual interface documentation artifacts.
 The generator creates this README, the [reusable Mermaid source](docs/landscape.mmd), interface pages, and system backlinks.
+Named views select existing interfaces. Scenarios add ordered steps, linked annotations, and explicit responses;
+their component maps, sequence diagrams, and step tables come from the same step list.
 
 ```sh
 python3 scripts/generate.py
 python3 scripts/generate.py --check
+python3 -m unittest discover -s tests -v
 ```
 
-Python 3.11+; no third-party dependencies. CI runs the check on pushes and pull requests.
+Python 3.11+; no third-party dependencies. CI runs the check and tests on pushes and pull requests.
 It checks references, artifact versions, generated-file drift, and repository-local link destinations.
 It does not validate a live deployment or perform full OpenAPI/JSON Schema conformance validation.
 

@@ -16,3 +16,8 @@ Boundary: **internal**. Owner: **Commerce Team**.
 | Outgoing | [IF-002 — Customer lookup](../interfaces/IF-002.md) | [External CRM](crm.md) | 1.4.0 |
 
 Directions follow the primary request or data flow. HTTP responses use the same interface.
+
+## Used in views
+
+- [Invoice creation](../views/invoice-creation.md)
+- [Invoicing subdomain](../views/invoicing-overview.md)

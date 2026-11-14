@@ -8,9 +8,12 @@ catalog/catalog.json              IDs, systems, connections, versions, notes
 docs/landscape.mmd                Generated reusable Mermaid diagram source
 docs/systems/<system-id>.md        Generated incoming/outgoing interface backlinks
 docs/interfaces/IF-xxx.md          Generated stable interface detail pages
+docs/views/<view-id>.md            Generated focused overview or scenario page
+docs/notes/                       Authored pages referenced by annotations
 contracts/<domain>/<versioned-file>  Versioned documentation artifacts
 scripts/generate.py               Generator and reference checker
 .github/workflows/docs.yml        Checks on pushes and pull requests
+tests/test_generate.py            Reference, scenario, and drift checks
 ```
 
 ## Address the connection explicitly
@@ -25,12 +28,85 @@ source and target each link back to it through a generated system page. The
 landscape table links to the same interface page and directly to its artifact.
 An external-to-external connection follows exactly the same structure.
 
+## Focused views and annotated scenarios
+
+The catalog's optional `views` list defines reusable views of the same interface
+definitions. Start with the [invoice creation scenario](views/invoice-creation.md)
+or the [invoicing subdomain overview](views/invoicing-overview.md).
+
+Each view has a unique lowercase slug `id`, a `kind`, a `title`, and a `summary`.
+An `overview` selects `interface_ids`; its diagram and table contain exactly those
+interfaces and their endpoints. It does not imply execution order or pull in
+other connections attached to the selected systems.
+
+A `scenario` instead defines an ordered `steps` list:
+
+```json
+{
+  "id": "invoice-creation",
+  "kind": "scenario",
+  "title": "Invoice creation",
+  "summary": "From an accepted order to a confirmed ERP invoice.",
+  "steps": [
+    {"interface_id": "IF-001", "annotation": {"text": "Order accepted"}},
+    {
+      "interface_id": "IF-003",
+      "annotation": {
+        "text": "Create invoice using the mapping rules",
+        "target": "docs/notes/invoice-mapping.md"
+      }
+    },
+    {
+      "interface_id": "IF-003",
+      "direction": "reverse",
+      "annotation": {"text": "Return invoice ID"}
+    }
+  ]
+}
+```
+
+Array order determines step numbers. `direction` defaults to `forward`, using the
+interface's canonical source and target. `reverse` swaps those endpoints and
+uses dashed arrows. It documents a response or reverse message on the same
+interface, not another interface definition.
+
+The generator derives the scenario's interface membership and systems from its
+steps. Do not maintain an additional `interface_ids` list for a scenario. The same
+interface can appear multiple times; each occurrence has its own number and
+annotation, while all occurrences link to the same canonical interface page.
+
+The same steps generate a component map, an automatically numbered sequence
+diagram, and a step table. The map provides a clickable interface node per step.
+Linked annotations have a separate destination: for example, step 2 opens the
+authored [invoice mapping rules](notes/invoice-mapping.md). Names, selected
+versions, protocols, and artifact paths always come from the shared interfaces.
+
+Annotation `text` is plain text. Optional `target` is a repository-root-relative
+Markdown page path, not relative to the view page. Targets may be authored or
+generated pages. This first version accepts page paths without URL schemes,
+queries, or heading fragments; paths with spaces are URL-encoded automatically.
+Missing pages and paths outside the repository fail validation.
+
+GitHub's current Mermaid renderer preserves hyperlinks embedded in flowchart
+connection labels. Other viewers may disable them. Sequence message labels and
+notes do not support these HTML annotation links, so they show plain annotation
+text; the adjacent step table provides the same clickable annotation. The table
+also links to canonical interface pages and their current contract artifacts.
+
+The README lists every view. Interface and system pages generate "Used in views"
+backlinks from view membership, counting a scenario once even if it uses an
+interface repeatedly. All generated views, including their displayed metadata,
+are regenerated together; only the catalog and authored reference pages need
+maintenance. This version models linear scenarios, including explicit responses.
+
 ## Two link styles, for two contexts
 
 Ordinary Markdown uses relative file links. GitHub can resolve these against the
 current branch or commit, so the text navigation works when browsing a branch.
 
-Mermaid `click` directives use full GitHub `blob/main/...` URLs and target `_top`.
+Mermaid `click` directives and annotation hyperlinks use full GitHub
+`blob/main/...` URLs. `click` directives request target `_top`; GitHub may rewrite
+navigation targets to `_parent`.
 Mermaid may render in an iframe; a relative URL can otherwise resolve against
 the diagram host. The `_top` target requests navigation outside that frame.
 These diagram links intentionally point to the configured branch. A diagram
@@ -61,11 +137,13 @@ this small demo models only one selected version per interface.
 1. Change systems or interfaces in [the catalog](../catalog/catalog.json).
 2. Add the versioned contract under [contracts](../contracts/).
 3. Run `python3 scripts/generate.py`, then `python3 scripts/generate.py --check`.
-4. Commit the catalog, contracts, and generated Markdown together for review.
+4. Run `python3 -m unittest discover -s tests -v`.
+5. Commit the catalog, contracts, authored reference pages, and generated Markdown together for review.
 
 The check rejects duplicate IDs, unknown endpoints, missing artifacts, version
-mismatches, stale generated output, orphaned generated pages, and missing local
-Markdown destinations. It uses the Python standard library. It does not make
+mismatches, invalid views or steps, missing annotation targets, stale generated
+output, orphaned generated pages, and missing local Markdown destinations. It
+uses the Python standard library. It does not make
 network requests, check external links, inspect live deployed versions, or fully
 validate OpenAPI/JSON Schema semantics.
 

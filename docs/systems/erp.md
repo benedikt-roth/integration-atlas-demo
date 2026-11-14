@@ -17,3 +17,8 @@ Boundary: **external**. Owner: **ERP Vendor / Finance Operations**.
 | Incoming | [IF-005 — Nightly customer export](../interfaces/IF-005.md) | [External CRM](crm.md) | 3.0.0 |
 
 Directions follow the primary request or data flow. HTTP responses use the same interface.
+
+## Used in views
+
+- [Invoice creation](../views/invoice-creation.md)
+- [Invoicing subdomain](../views/invoicing-overview.md)
