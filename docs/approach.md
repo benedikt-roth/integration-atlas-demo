@@ -2,6 +2,11 @@
 
 [Back to the landscape](../README.md)
 
+**Agreed target design:** see the [solution architecture](solution-architecture.md)
+for the two-layer model, per-entity JSON files, CUE validation, usages defined only
+in views, and Mermaid publication in GitHub. The page below describes the current
+POC implementation; migration to the target architecture has not been implemented.
+
 ```text
 README.md                         Generated Mermaid overview and linked catalog
 catalog/catalog.json              IDs, systems, connections, versions, notes
