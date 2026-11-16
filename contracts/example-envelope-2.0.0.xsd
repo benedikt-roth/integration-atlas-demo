@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="urn:example:envelope:2"
+           xmlns="urn:example:envelope:2"
+           elementFormDefault="qualified" version="2.0.0">
+  <xs:element name="envelope">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="correlationId" type="xs:string"/>
+        <xs:element name="payload">
+          <xs:complexType mixed="true">
+            <xs:sequence>
+              <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

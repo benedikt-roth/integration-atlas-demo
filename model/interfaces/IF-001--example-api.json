@@ -1,0 +1,13 @@
+{
+  "id": "IF-001",
+  "name": "Example API",
+  "description": "One interface definition, reused by view steps. The envelope declaration is a capability, not an actual route.",
+  "owner": {"kind": "system", "id": "SYS-001"},
+  "protocol": "HTTPS / JSON",
+  "versions": {
+    "1.0.0": {
+      "artifacts": [{"label": "OpenAPI specification", "kind": "openapi", "path": "contracts/example-api-1.0.0.openapi.json"}],
+      "envelopes": {"DC-001": ["2.0.0"]}
+    }
+  }
+}
