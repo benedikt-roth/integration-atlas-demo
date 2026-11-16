@@ -1,0 +1,12 @@
+{
+  "openapi": "3.1.0",
+  "info": {"title": "Example API", "version": "1.0.0"},
+  "paths": {
+    "/example": {
+      "post": {
+        "summary": "Run the example operation",
+        "responses": {"200": {"description": "Example operation completed"}}
+      }
+    }
+  }
+}

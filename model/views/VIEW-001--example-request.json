@@ -1,0 +1,28 @@
+{
+  "id": "VIEW-001",
+  "name": "Example request",
+  "description": "A minimal request and explicit response. Both representations use this one step list.",
+  "kind": "scenario",
+  "steps": [
+    {
+      "id": "send-request",
+      "kind": "request",
+      "participant": {"kind": "component", "id": "CMP-001"},
+      "interface": {"id": "IF-001", "version": "1.0.0"},
+      "annotation": {
+        "text": "Send example request",
+        "links": [
+          {"label": "Interface", "target": {"kind": "interface", "id": "IF-001"}},
+          {"label": "Notes", "target": {"kind": "file", "path": "docs/notes/example.md"}},
+          {"label": "Specification", "target": {"kind": "file", "path": "contracts/example-api-1.0.0.openapi.json"}}
+        ]
+      }
+    },
+    {
+      "id": "receive-response",
+      "kind": "response",
+      "responseTo": "send-request",
+      "annotation": {"text": "Receive example response"}
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "id": "CMP-001",
+  "name": "Example Worker",
+  "description": "A component that calls its platform's API. Replace it with your component.",
+  "systemId": "SYS-001"
+}

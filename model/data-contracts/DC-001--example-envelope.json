@@ -1,0 +1,10 @@
+{
+  "id": "DC-001",
+  "name": "Example Envelope",
+  "description": "A reusable envelope definition. Its schema version is independent of the API version.",
+  "versions": {
+    "2.0.0": {
+      "artifacts": [{"label": "Envelope XSD", "kind": "xsd", "path": "contracts/example-envelope-2.0.0.xsd"}]
+    }
+  }
+}
